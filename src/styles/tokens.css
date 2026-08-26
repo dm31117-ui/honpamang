@@ -1,0 +1,75 @@
+/* Design tokens — 혼파망 handoff (hifi) */
+:root {
+  /* Colors */
+  --ink: #111111;
+  --ink-hover: #333333;
+  --ink-border: #141414;
+  --body: #333333;
+  --body-2: #444444;
+  --muted: #8c8c8c;
+  --muted-2: #737373;
+  --muted-3: #555550;
+  --faint: #b0b0ab;
+
+  --accent: #ff4e2b;
+  --accent-hover: #e5391b;
+  --accent-deep: #d6431f;
+  --accent-tint: #ffede7;
+  --accent-line: #ffd9d0;
+
+  --surface: #fafaf8;
+  --surface-2: #fcfcfa;
+  --surface-3: #f7f7f5;
+  --chip: #f5f5f2;
+  --chip-2: #f3f3f0;
+  --track: #efefea;
+  --border: #e8e8e4;
+  --border-soft: #efefec;
+  --divider: #d5d5d0;
+  --white: #ffffff;
+
+  --ticker-text: #666663;
+  --shout-ambient: #a9a49c;
+
+  /* Radii */
+  --r-pill: 9999px;
+  --r-20: 20px;
+  --r-18: 18px;
+  --r-16: 16px;
+  --r-14: 14px;
+  --r-12: 12px;
+  --r-10: 10px;
+
+  /* Shadows */
+  --sh-hard: 0 4px 0 var(--ink-border);
+  --sh-hard-active: 0 1px 0 var(--ink-border);
+  --sh-card-hover: 0 8px 20px rgba(0, 0, 0, 0.06);
+  --sh-modal: 0 24px 48px rgba(0, 0, 0, 0.14);
+  --sh-popup: 0 16px 32px rgba(0, 0, 0, 0.08);
+  --sh-dropdown: 0 12px 28px rgba(0, 0, 0, 0.12);
+
+  /* Layout */
+  --page-max: 1280px;
+  --page-max-narrow: 920px;
+  --page-pad: 32px;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-transform: transform 0.16s ease;
+  --t-paint: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+
+  /* Map zoom factor — shared by JS (MAP_ZOOM) and CSS */
+  --map-zoom: 6.5;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --page-pad: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --page-pad: 16px;
+  }
+}

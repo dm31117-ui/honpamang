@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm ci --prefer-offline --no-audit --no-fund 2>&1 | tail -3"
+          }
+        ]
+      }
+    ]
+  }
+}

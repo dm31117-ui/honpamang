@@ -1,0 +1,374 @@
+/* ---------- 검색 + 필터 ---------- */
+
+.muFilters {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.muSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 240px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 10px 18px;
+  color: var(--muted);
+  transition: border-color 0.2s ease;
+}
+
+.muSearch:focus-within {
+  border-color: var(--ink);
+}
+
+.muSearch__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: none;
+  color: var(--ink);
+}
+
+.muTabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.muTabs--halls {
+  margin-top: 10px;
+}
+
+.muLegend {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.muLegend__national {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.muLegend__treasure {
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+/* ---------- 목록 + 상세 ---------- */
+
+.muBoard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  gap: 32px;
+  margin-top: 32px;
+  align-items: start;
+}
+
+.muList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.muCard {
+  text-align: left;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-16);
+  padding: 18px 20px;
+  cursor: pointer;
+  transition:
+    var(--t-transform),
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (hover: hover) {
+  .muCard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sh-card-hover);
+  }
+}
+
+.muCard[data-selected='true'] {
+  border-color: var(--ink);
+}
+
+.muCard__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.muCard__nick {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.muCard__era {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.muCard__title {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--body);
+  font-weight: 500;
+}
+
+.muCard[data-selected='true'] .muCard__title {
+  font-weight: 700;
+}
+
+.muCard__stats {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.muCard__total {
+  color: var(--accent);
+}
+
+.muEmpty {
+  margin: 24px 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ---------- 상세 패널 ---------- */
+
+.muDetail {
+  position: sticky;
+  top: 24px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-20);
+  padding: 28px;
+  background: var(--surface);
+  animation: fadeIn 0.25s ease;
+  min-width: 0;
+}
+
+.muDetail__champion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.muDetail__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.muDetail__no {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.muDetail__title {
+  margin: 14px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.3px;
+}
+
+.muDetail__dl {
+  margin: 20px 0 0;
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 8px 12px;
+  font-size: 13px;
+}
+
+.muDetail__dl dt {
+  color: var(--muted);
+}
+
+.muDetail__dl dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+.muDetail__strong {
+  font-weight: 600;
+}
+
+.muDetail__comment {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.muDetail__commentLabel {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.muDetail__commentBody {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--body-2);
+  line-height: 1.6;
+}
+
+.muDetail__reactions {
+  display: flex;
+  gap: 6px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.muDetail__reaction {
+  white-space: nowrap;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  background: var(--white);
+  color: var(--body-2);
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .muDetail__reaction:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+.muDetail__reaction[data-sent='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* 바텀시트로 뜰 때만 쓰이는 닫기 버튼 */
+.muDetail__closeSheet {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+}
+
+/* ---------- 등록 모달 ---------- */
+
+.muSubmit__text {
+  margin-top: 20px;
+  height: 88px;
+}
+
+.muSubmit__halls {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.muSubmit__cta {
+  margin-top: 20px;
+}
+
+/* ---------- 반응형 ---------- */
+
+@media (max-width: 1100px) {
+  .muBoard {
+    /* 480px 2단은 1100px 밑에서 서로를 짓누른다 — 한 칸으로 내린다. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  .muBoard {
+    margin-top: 24px;
+  }
+  /* 상세는 바텀시트(Modal)로 뜨므로 sticky 여백을 지운다. */
+  .muDetail {
+    position: static;
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+  .muDetail__title {
+    font-size: 18px;
+    padding-right: 34px;
+  }
+}
+
+@media (max-width: 600px) {
+  .muFilters {
+    margin-top: 8px;
+    gap: 10px;
+  }
+  .muSearch {
+    min-width: 100%;
+    padding: 9px 16px;
+  }
+  .muTabs {
+    /* 탭을 접지 않고 가로 스크롤로 흘린다. */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    margin: 0 calc(var(--page-pad) * -1);
+    padding-left: var(--page-pad);
+    padding-right: var(--page-pad);
+  }
+  .muTabs::-webkit-scrollbar {
+    display: none;
+  }
+  .muTabs .tab {
+    flex: none;
+  }
+  .muCard {
+    padding: 16px 17px;
+  }
+  .muCard__title {
+    font-size: 14px;
+  }
+  .muCard__era {
+    margin-left: 0;
+  }
+  .muDetail__reactions {
+    gap: 6px;
+  }
+  .muDetail__reaction {
+    flex: 1 1 calc(50% - 3px);
+    text-align: center;
+  }
+}

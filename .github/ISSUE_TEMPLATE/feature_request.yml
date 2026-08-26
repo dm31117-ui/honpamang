@@ -1,0 +1,23 @@
+name: 기능 제안
+description: 새로운 기능이나 개선 아이디어를 제안합니다.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 어떤 문제를 풀고 싶나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: 제안하는 방식
+    validations:
+      required: true
+
+  - type: textarea
+    id: design
+    attributes:
+      label: 디자인 참고
+      description: 핸드오프 문서의 어느 부분인지, 새 디자인이 필요한지 적어주세요.

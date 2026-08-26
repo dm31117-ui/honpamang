@@ -1,0 +1,101 @@
+.cardModal__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardModal__nick {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.cardModal__chip {
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--chip);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.cardModal__time {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.cardModal__story {
+  margin: 20px 0 0;
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 600;
+  min-height: 56px;
+}
+
+.cardModal__story[data-phase='shattering'] {
+  animation: shatter 0.9s ease forwards;
+}
+
+.cardModal__story[data-phase='done'] {
+  animation: riseIn 0.4s ease;
+}
+
+.cardModal__reactions {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.cardModal__reaction {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (hover: hover) {
+  .cardModal__reaction:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+}
+
+.cardModal__reaction[data-sent='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cardModal__despair {
+  margin-top: 10px;
+}
+
+.cardModal__despair:disabled {
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  .cardModal__story {
+    font-size: 18px;
+    min-height: 48px;
+  }
+  /* 반응 4개를 한 줄에 욱여넣지 않고 2×2로 편다. */
+  .cardModal__reactions {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 20px;
+  }
+  .cardModal__reaction {
+    flex: 1 1 calc(50% - 3px);
+    font-size: 12.5px;
+  }
+}

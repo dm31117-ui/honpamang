@@ -1,0 +1,52 @@
+.ticker {
+  background: var(--surface-3);
+  overflow: hidden;
+  padding: 11px 0;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.ticker__rail {
+  display: inline-flex;
+  animation: ticker 40s linear infinite;
+  will-change: transform;
+}
+
+.ticker__block {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ticker-text);
+}
+
+.ticker__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ticker__flash {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.ticker__sep {
+  margin: 0 28px;
+  color: var(--divider);
+}
+
+@media (max-width: 600px) {
+  .ticker {
+    padding: 9px 0;
+  }
+  .ticker__block {
+    font-size: 12px;
+  }
+  .ticker__sep {
+    margin: 0 18px;
+  }
+  /* 모바일에서는 글자가 작아 한 바퀴가 짧아지므로 속도도 함께 줄인다. */
+  .ticker__rail {
+    animation-duration: 30s;
+  }
+}

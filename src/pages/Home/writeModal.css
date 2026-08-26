@@ -1,0 +1,22 @@
+.modalFields {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.writeModal__text {
+  margin-top: 20px;
+  height: 96px;
+}
+
+.writeModal__submit {
+  margin-top: 14px;
+}
+
+@media (max-width: 480px) {
+  /* 좁은 화면에서 닉네임/지역을 나란히 두면 둘 다 못 읽는다 — 세로로 편다. */
+  .modalFields {
+    flex-direction: column;
+    gap: 14px;
+  }
+}

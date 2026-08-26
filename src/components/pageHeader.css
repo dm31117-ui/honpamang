@@ -1,0 +1,62 @@
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 0;
+}
+
+.pageHeader__left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pageHeader__back {
+  flex: none;
+}
+
+.pageHeader__logo {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+}
+
+.pageHeader__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -1.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 560px) {
+  .pageHeader {
+    padding: 14px 0;
+    gap: 8px;
+  }
+  .pageHeader__back {
+    padding: 8px 10px;
+  }
+  /* 좁은 화면에서는 아이콘만 남긴다 — 로고 + 제목에 폭을 양보. */
+  .pageHeader__backLabel {
+    display: none;
+  }
+  .pageHeader__title {
+    font-size: 17px;
+    letter-spacing: -0.9px;
+  }
+}
+
+@media (max-width: 380px) {
+  .pageHeader__title {
+    font-size: 15px;
+  }
+}

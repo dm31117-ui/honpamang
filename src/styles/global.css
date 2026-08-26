@@ -1,0 +1,294 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--white);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family:
+    'DM Sans',
+    'Pretendard Variable',
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Apple SD Gothic Neo',
+    sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* iOS: keep the fixed siren glow from being clipped oddly on rubber-band scroll */
+  overscroll-behavior-y: none;
+}
+
+body.is-locked {
+  overflow: hidden;
+}
+
+a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+  letter-spacing: -0.02em;
+}
+
+/* Remove iOS tap highlight; we ship our own press states. */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+/* ---------- Layout primitives ---------- */
+
+.page {
+  min-height: 100dvh;
+  padding-bottom: 40px;
+  position: relative;
+  /* SOS 펄스 링·사이렌 글로우 같은 장식이 좁은 화면에서 문서를 옆으로 밀지 않게.
+     `clip`은 `hidden`과 달리 스크롤 컨테이너를 만들지 않아 박물관 상세의
+     position:sticky가 그대로 동작한다. */
+  overflow-x: clip;
+}
+
+.container {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+  position: relative;
+  z-index: 10;
+}
+
+.container--narrow {
+  max-width: var(--page-max-narrow);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Keyframes (shared set) ---------- */
+
+@keyframes blinkDot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes sirenPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes pinPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes radarSweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes newGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px var(--accent-line);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px var(--accent-line),
+      0 0 18px rgba(255, 78, 43, 0.22);
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shatter {
+  0% {
+    letter-spacing: -0.02em;
+    filter: blur(0);
+    opacity: 1;
+  }
+  100% {
+    letter-spacing: 0.6em;
+    filter: blur(6px);
+    opacity: 0;
+  }
+}
+
+@keyframes riseIn {
+  from {
+    transform: translateY(14px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shoutFly {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, 6px, 0);
+  }
+  12% {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -56px, 0);
+  }
+}
+
+@keyframes chaosShake {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  15% {
+    transform: translate(-6px, 2px) rotate(-1.5deg);
+  }
+  30% {
+    transform: translate(7px, -3px) rotate(1.8deg);
+  }
+  45% {
+    transform: translate(-8px, -2px) rotate(-2.2deg);
+  }
+  60% {
+    transform: translate(8px, 3px) rotate(2deg);
+  }
+  75% {
+    transform: translate(-5px, 1px) rotate(-1deg);
+  }
+  90% {
+    transform: translate(4px, -2px) rotate(1deg);
+  }
+}
+
+@keyframes destroy {
+  0% {
+    letter-spacing: -0.02em;
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1);
+  }
+  60% {
+    letter-spacing: 0.5em;
+    filter: blur(4px);
+    opacity: 0.6;
+    transform: scale(1.08);
+  }
+  100% {
+    letter-spacing: 1em;
+    filter: blur(14px);
+    opacity: 0;
+    transform: scale(1.25) translateY(-20px);
+  }
+}
+
+@keyframes smoke {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+  }
+  30% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(1.6);
+  }
+}
+
+@keyframes barGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Respect reduced-motion: kill the ambient loops, keep the one-shot reveals subtle. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

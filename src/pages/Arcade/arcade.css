@@ -1,0 +1,701 @@
+/* ---------- 헤더 액션 ---------- */
+
+.arForget {
+  white-space: nowrap;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  cursor: pointer;
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  background: var(--ink);
+  color: var(--white);
+  transition:
+    background 0.2s ease,
+    var(--t-transform);
+}
+@media (hover: hover) {
+  .arForget:hover {
+    background: var(--ink-hover);
+  }
+}
+.arForget:active {
+  transform: translateY(1px);
+}
+
+/* ---------- 섹션 공통 (홈보다 한 톤 낮은 밀도) ---------- */
+
+.arSection {
+  margin-top: 28px;
+  border-radius: var(--r-18);
+  border: 1px solid var(--border-soft);
+  padding: 28px 30px;
+  background: var(--surface-2);
+}
+
+.arSection--balance {
+  margin-top: 16px;
+}
+
+.arSection__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.arSection__name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.arBadge--test {
+  background: var(--accent-tint);
+  color: var(--accent-deep);
+}
+
+.arBadge--balance {
+  background: var(--track);
+  color: var(--muted-3);
+}
+
+/* ---------- 01 유형검사 ---------- */
+
+.arQuiz__hook {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.7px;
+}
+
+.arQuiz__sub {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.arQuiz__start {
+  margin-top: 24px;
+  padding: 14px 28px;
+  border-radius: var(--r-pill);
+  border: none;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  transition:
+    background 0.2s ease,
+    var(--t-transform);
+}
+@media (hover: hover) {
+  .arQuiz__start:hover {
+    background: var(--accent-hover);
+  }
+}
+.arQuiz__start:active {
+  transform: translateY(1px);
+}
+
+.arQuiz__progress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.arQuiz__step {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.arQuiz__track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--border);
+}
+
+.arQuiz__bar {
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  transition: width 0.3s ease;
+}
+
+.arQuiz__question {
+  margin: 22px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.4px;
+  animation: riseIn 0.3s ease;
+}
+
+.arQuiz__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.arQuiz__option {
+  text-align: left;
+  padding: 15px 18px;
+  border-radius: var(--r-14);
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  line-height: 1.45;
+  transition:
+    var(--t-transform),
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+@media (hover: hover) {
+  .arQuiz__option:hover {
+    border-color: var(--ink);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  }
+}
+.arQuiz__option:active {
+  transform: translateY(2px);
+}
+
+/* ---------- 결과 공유 카드 ---------- */
+
+.arResult {
+  animation: riseIn 0.4s var(--ease-out-expo);
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.arCard {
+  background: var(--white);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--r-20);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-width: 100%;
+}
+
+.arCard[data-ratio='square'] {
+  aspect-ratio: 1 / 1;
+  width: 340px;
+}
+
+.arCard[data-ratio='tall'] {
+  aspect-ratio: 9 / 16;
+  width: 280px;
+}
+
+.arCard__label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.arCard__name {
+  margin: 12px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  line-height: 1.25;
+}
+
+.arCard__desc {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--muted-2);
+  line-height: 1.6;
+}
+
+.arCard__gauges {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.arGauge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.arGauge__name {
+  width: 34px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted-2);
+  flex: none;
+}
+
+.arGauge__track {
+  flex: 1;
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: var(--track);
+}
+
+.arGauge__fill {
+  height: 7px;
+  border-radius: var(--r-pill);
+  transform-origin: left;
+  animation: barGrow 0.6s var(--ease-out-expo);
+}
+
+.arGauge__pct {
+  width: 38px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  flex: none;
+}
+
+.arCard__brand {
+  margin: 10px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.arShare {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.arShare__label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.arShare__ratios {
+  display: flex;
+  gap: 8px;
+}
+
+.arShare__ratio {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: var(--r-10);
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--t-paint);
+}
+
+.arShare__ratio[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--white);
+  border-color: var(--ink);
+}
+
+.arShare__btn {
+  padding: 13px 0;
+  border-radius: var(--r-10);
+  border: none;
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background 0.2s ease,
+    var(--t-transform);
+}
+.arShare__btn:active {
+  transform: translateY(1px);
+}
+
+.arShare__btn--accent {
+  background: var(--accent);
+}
+.arShare__btn--ink {
+  background: var(--ink);
+}
+
+@media (hover: hover) {
+  .arShare__btn--accent:hover {
+    background: var(--accent-hover);
+  }
+  .arShare__btn--ink:hover {
+    background: var(--ink-hover);
+  }
+}
+
+/* ---------- 02 밸런스 게임 ---------- */
+
+.arBalance__question {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.4px;
+}
+
+.arBalance__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.arBalance__option {
+  text-align: left;
+  padding: 20px;
+  border-radius: var(--r-16);
+  border: 1px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition:
+    var(--t-transform),
+    border-color 0.2s ease;
+}
+
+.arBalance__option[data-picked='true'] {
+  border-color: var(--accent);
+}
+
+@media (hover: hover) {
+  .arBalance__option:hover {
+    transform: translateY(-2px);
+  }
+}
+.arBalance__option:active {
+  transform: translateY(1px);
+}
+
+.arBalance__text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.arBalance__result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.arBalance__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.arBalance__pct {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.arBalance__votes {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.arBalance__track {
+  display: block;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--track);
+  overflow: hidden;
+}
+
+.arBalance__fill {
+  display: block;
+  height: 8px;
+  border-radius: var(--r-pill);
+  transform-origin: left;
+  animation: barGrow 0.6s var(--ease-out-expo);
+}
+
+.arBalance__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.arBalance__note {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  animation: fadeIn 0.4s ease;
+}
+
+/* ---------- 망각하기 모달 ---------- */
+
+.forget__heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.forget__badge {
+  background: var(--track);
+  color: var(--muted-3);
+}
+
+.forget__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.forget__desc {
+  margin: 12px 0 0;
+  font-size: 15px;
+  color: var(--muted-2);
+  line-height: 1.55;
+}
+
+.forget__text {
+  margin-top: 20px;
+  height: 92px;
+  border-radius: var(--r-14);
+  font-size: 15px;
+}
+
+.forget__cta {
+  margin-top: 16px;
+  padding: 14px 28px;
+  border-radius: var(--r-pill);
+  border: none;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  transition:
+    background 0.2s ease,
+    var(--t-transform);
+}
+@media (hover: hover) {
+  .forget__cta:hover {
+    background: var(--ink-hover);
+  }
+}
+.forget__cta:active {
+  transform: translateY(1px);
+}
+
+.forget__stage {
+  margin-top: 20px;
+  min-height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.forget__victim {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  letter-spacing: -0.3px;
+  overflow-wrap: anywhere;
+}
+
+.forget__victim[data-phase='chaos'] {
+  animation: chaosShake 0.9s ease-in-out;
+}
+
+.forget__victim[data-phase='destroy'] {
+  animation: destroy 1.1s ease forwards;
+}
+
+.forget__smoke {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 18px;
+  pointer-events: none;
+}
+
+.forget__puff {
+  border-radius: var(--r-pill);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.forget__puff--a {
+  width: 26px;
+  height: 26px;
+  filter: blur(8px);
+  animation: smoke 1.4s ease-out forwards;
+}
+
+.forget__puff--b {
+  width: 38px;
+  height: 38px;
+  background: rgba(255, 78, 43, 0.18);
+  filter: blur(10px);
+  animation: smoke 1.6s 0.1s ease-out forwards;
+}
+
+.forget__puff--c {
+  width: 22px;
+  height: 22px;
+  filter: blur(7px);
+  animation: smoke 1.3s 0.2s ease-out forwards;
+}
+
+.forget__done {
+  margin-top: 20px;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  animation: fadeIn 0.6s ease;
+}
+
+.forget__doneText {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+}
+
+.forget__again {
+  width: auto;
+  padding: 10px 18px;
+  border-radius: var(--r-pill);
+}
+
+/* ---------- 반응형 ---------- */
+
+@media (max-width: 700px) {
+  .arSection {
+    margin-top: 20px;
+    padding: 22px 20px;
+    border-radius: var(--r-16);
+  }
+  .arSection--balance {
+    margin-top: 12px;
+  }
+  .arQuiz__hook {
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+  .arQuiz__question,
+  .arBalance__question {
+    font-size: 18px;
+  }
+  .arQuiz__option {
+    padding: 14px 16px;
+    font-size: 13.5px;
+  }
+  .arQuiz__start {
+    width: 100%;
+    padding: 14px 0;
+  }
+  .arResult {
+    gap: 20px;
+  }
+  /* 공유 카드는 화면 폭에 맞춰 줄이되 비율은 유지한다. */
+  .arCard {
+    padding: 22px;
+  }
+  .arCard[data-ratio='square'] {
+    width: min(340px, 100%);
+  }
+  .arCard[data-ratio='tall'] {
+    width: min(280px, 78%);
+  }
+  .arCard__name {
+    font-size: 22px;
+  }
+  .arCard__desc {
+    font-size: 13px;
+  }
+  .arShare {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+  .arBalance__option {
+    padding: 17px;
+  }
+  .arBalance__footer {
+    gap: 12px;
+  }
+  .arBalance__note {
+    font-size: 13px;
+  }
+  .arForget {
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+  .forget__desc {
+    font-size: 14px;
+  }
+  .forget__victim {
+    font-size: 19px;
+  }
+  .forget__doneText {
+    font-size: 16px;
+  }
+  .forget__cta {
+    width: 100%;
+    padding: 14px 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .arBalance__options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

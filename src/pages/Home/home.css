@@ -1,0 +1,194 @@
+/* 사이렌 앰비언트 글로우 — 티커 바로 아래에서 페이지 상단을 덮는다. */
+.siren {
+  position: absolute;
+  top: 39px;
+  left: 0;
+  right: 0;
+  height: 180px;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 78, 43, 0.24) 0%,
+    rgba(255, 78, 43, 0.06) 55%,
+    transparent 100%
+  );
+  animation: sirenPulse 3.4s ease-in-out infinite;
+}
+
+.homeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+}
+
+.homeHeader__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------- 지도 + 피드 ---------- */
+
+.board {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.board__map {
+  min-width: 0;
+}
+
+.board__caption {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- 하단 진입 카드 ---------- */
+
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: 64px;
+}
+
+.shortcut {
+  text-align: left;
+  border-radius: var(--r-20);
+  padding: 24px 28px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  transition: var(--t-transform);
+}
+
+@media (hover: hover) {
+  .shortcut:hover {
+    transform: translateY(-2px);
+  }
+}
+.shortcut:active {
+  transform: translateY(1px);
+}
+
+.shortcut--dark {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.shortcut--light {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  color: var(--ink);
+}
+
+.shortcut__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.shortcut__text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.shortcut__title {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.shortcut__sub {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.shortcut--dark .shortcut__sub {
+  color: var(--faint);
+}
+.shortcut--light .shortcut__sub {
+  color: var(--muted);
+}
+
+.shortcut__badge {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--white);
+}
+
+.shortcut__badge--accent {
+  background: var(--accent);
+}
+.shortcut__badge--ink {
+  background: var(--ink);
+}
+
+/* ---------- 반응형 ---------- */
+
+@media (max-width: 1024px) {
+  .board {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .shortcuts {
+    margin-top: 48px;
+  }
+}
+
+@media (max-width: 600px) {
+  .siren {
+    top: 35px;
+    height: 140px;
+  }
+  .homeHeader {
+    padding: 14px 0;
+  }
+  .board {
+    margin-top: 8px;
+    gap: 28px;
+  }
+  .board__caption {
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  .shortcuts {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 40px;
+  }
+  .shortcut {
+    padding: 20px 22px;
+  }
+  .shortcut__title {
+    font-size: 18px;
+  }
+  .shortcut__sub {
+    font-size: 12px;
+  }
+  .shortcut__badge {
+    width: 34px;
+    height: 34px;
+  }
+}

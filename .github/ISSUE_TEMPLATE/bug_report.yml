@@ -1,0 +1,56 @@
+name: 버그 리포트
+description: 동작이 이상하거나 화면이 깨지는 문제를 알려주세요.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 무슨 일이 일어났나요?
+      description: 기대한 동작과 실제 동작을 같이 적어주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법
+      placeholder: |
+        1. `/museum` 으로 이동
+        2. 등급 탭에서 '국보' 선택
+        3. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: screen
+    attributes:
+      label: 어느 화면인가요?
+      options:
+        - 메인 (SOS · 지도 · 비상벨 피드)
+        - 대참사 박물관
+        - 혼파망 놀이터
+        - 공통 / 여러 화면
+    validations:
+      required: true
+
+  - type: dropdown
+    id: viewport
+    attributes:
+      label: 화면 크기
+      options:
+        - 데스크톱
+        - 태블릿
+        - 모바일
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: 브라우저 / OS
+      placeholder: 'Chrome 126 / macOS 14, Safari / iOS 17'
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 스크린샷 · 콘솔 로그
