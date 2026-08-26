@@ -102,9 +102,42 @@ src/
 `main`에 푸시하면 `.github/workflows/deploy.yml`이 GitHub Pages로 배포합니다.
 저장소 **Settings → Pages → Source**를 **GitHub Actions**로 한 번 지정해 두면 됩니다.
 
-프로젝트 페이지는 `/<repo>/` 아래에서 서빙되므로 빌드 시 `BASE_PATH`를 넘기고
-(`BASE_PATH=/honpamang/ npm run build`), 라우터는 `import.meta.env.BASE_URL`을 basename으로 씁니다.
-Pages에는 서버 리라이트가 없어서 `index.html`을 `404.html`로 복사해 SPA 딥링크를 처리합니다.
+기본값은 프로젝트 페이지(`https://<user>.github.io/<repo>/`)입니다. Pages에는 서버 리라이트가
+없어서 `index.html`을 `404.html`로 복사해 `/museum` 같은 딥링크를 처리합니다.
+
+### 커스텀 도메인 붙이기
+
+**1. DNS 레코드** — 도메인 등록기관의 DNS 관리에서:
+
+| 종류 | 호스트 | 값 |
+| --- | --- | --- |
+| A | `@` (루트) | `185.199.108.153` |
+| A | `@` | `185.199.109.153` |
+| A | `@` | `185.199.110.153` |
+| A | `@` | `185.199.111.153` |
+| CNAME | `www` | `<user>.github.io` |
+
+IPv6도 받으려면 AAAA 레코드 4개를 함께 겁니다 —
+`2606:50c0:8000::153`, `8001::153`, `8002::153`, `8003::153`.
+
+루트와 `www` 둘 다 걸어두면 GitHub이 한쪽으로 리다이렉트해 줍니다.
+
+**2. GitHub 설정** — Settings → Pages → Custom domain에 도메인을 넣고 저장합니다.
+DNS 확인이 끝나면 **Enforce HTTPS**를 켭니다 (인증서 발급에 몇 분에서 한 시간쯤 걸립니다).
+
+**3. 저장소 설정** — `.github/workflows/deploy.yml` 맨 위 `CUSTOM_DOMAIN`에 도메인을 적습니다.
+
+```yaml
+env:
+  CUSTOM_DOMAIN: 'honpamang.kr'
+```
+
+이 값이 채워지면 빌드 base가 `/<repo>/`에서 `/`로 바뀌고, 배포 아티팩트에 `CNAME` 파일이
+함께 올라갑니다. **이 단계를 건너뛰면 자산을 `honpamang.kr/<repo>/assets/...`에서 찾다가
+404가 나 흰 화면이 뜹니다.** 커스텀 도메인을 떼면 값을 다시 비우면 됩니다.
+
+DNS 전파 전에 3번만 먼저 적용하면 기존 `github.io/<repo>/` 주소가 깨지니, DNS → Settings →
+워크플로 순서로 진행하세요.
 
 ## 핸드오프에서 내린 결정
 

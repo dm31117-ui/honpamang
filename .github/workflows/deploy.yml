@@ -5,6 +5,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  # 커스텀 도메인을 붙였다면 여기에 적는다 (예: honpamang.kr).
+  # 비워두면 https://<user>.github.io/<repo>/ 로 배포된다.
+  # 이 값을 채우기 전에 DNS와 Settings → Pages → Custom domain을 먼저 맞춰야 한다.
+  CUSTOM_DOMAIN: ''
+
 # Pages 배포에 필요한 최소 권한
 permissions:
   contents: read
@@ -29,16 +35,28 @@ jobs:
 
       - run: npm ci
 
-      - name: Build
-        # 프로젝트 페이지는 /<repo>/ 아래에서 서빙되므로 base path를 넘긴다.
-        run: npm run build
-        env:
-          BASE_PATH: /${{ github.event.repository.name }}/
+      - name: Resolve base path
+        # 커스텀 도메인은 루트에서 서빙되지만, 프로젝트 페이지는 /<repo>/ 아래다.
+        # 여기를 틀리면 자산 경로가 어긋나 흰 화면이 뜬다.
+        run: |
+          if [ -n "$CUSTOM_DOMAIN" ]; then
+            echo "BASE_PATH=/" >> "$GITHUB_ENV"
+          else
+            echo "BASE_PATH=/${GITHUB_REPOSITORY#*/}/" >> "$GITHUB_ENV"
+          fi
 
-      - name: Add SPA fallback
+      - name: Build
+        run: npm run build
+
+      - name: Add SPA fallback and CNAME
         # Pages에는 서버 리라이트가 없다. /museum 같은 경로를 새로고침해도
         # index.html이 뜨도록 404.html을 같은 내용으로 복사한다.
-        run: cp dist/index.html dist/404.html
+        # CNAME은 Settings의 커스텀 도메인이 초기화돼도 배포로 다시 세워지게 하는 안전장치다.
+        run: |
+          cp dist/index.html dist/404.html
+          if [ -n "$CUSTOM_DOMAIN" ]; then
+            echo "$CUSTOM_DOMAIN" > dist/CNAME
+          fi
 
       - uses: actions/configure-pages@v5
 
