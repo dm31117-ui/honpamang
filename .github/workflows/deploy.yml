@@ -59,6 +59,10 @@ jobs:
           fi
 
       - uses: actions/configure-pages@v5
+        with:
+          # 저장소에 Pages가 아직 켜져 있지 않으면 첫 실행에서 켠다.
+          # (저장소가 공개이거나 Pro 이상이어야 한다 — 무료 + 비공개면 여기서 실패한다.)
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:

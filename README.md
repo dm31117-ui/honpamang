@@ -100,7 +100,13 @@ src/
 ## 배포
 
 `main`에 푸시하면 `.github/workflows/deploy.yml`이 GitHub Pages로 배포합니다.
-저장소 **Settings → Pages → Source**를 **GitHub Actions**로 한 번 지정해 두면 됩니다.
+워크플로의 `configure-pages` 단계가 `enablement: true`라 Pages가 꺼져 있으면 첫 실행에서
+자동으로 켭니다. 안 켜지면 **Settings → Pages → Source**를 **GitHub Actions**로 직접 지정하세요.
+
+**전제: 저장소가 공개이거나 GitHub Pro 이상이어야 합니다.** 무료 플랜 + 비공개 저장소에서는
+Pages 배포 자체가 막혀 있어 `configure-pages` 단계에서 실패합니다. Pro로 비공개 저장소를
+배포하더라도 **게시된 사이트는 공개**입니다 (소스만 비공개). 사이트 자체에 접근 제한을 거는
+기능은 Enterprise Cloud 전용입니다.
 
 기본값은 프로젝트 페이지(`https://<user>.github.io/<repo>/`)입니다. Pages에는 서버 리라이트가
 없어서 `index.html`을 `404.html`로 복사해 `/museum` 같은 딥링크를 처리합니다.
