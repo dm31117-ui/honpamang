@@ -30,6 +30,10 @@ body {
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* 한글은 기본값이면 단어 중간에서 잘린다("나옵니 / 다").
+     keep-all로 어절 단위로 끊고, 끊을 수 없는 긴 토큰만 break-word로 흘린다. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
   /* iOS: keep the fixed siren glow from being clipped oddly on rubber-band scroll */
   overscroll-behavior-y: none;
 }

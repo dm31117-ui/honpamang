@@ -324,7 +324,7 @@ export function Home() {
             <span className="shortcut__row">
               <span className="shortcut__text">
                 <span className="shortcut__title">내 인생 혼파망 테스트</span>
-                <span className="shortcut__sub">5문항 · 3분이면 결과가 나옵니다</span>
+                <span className="shortcut__sub">6문항 · 3분이면 결과가 나옵니다</span>
               </span>
               <span className="shortcut__badge shortcut__badge--ink">
                 <ArrowUpRightIcon />

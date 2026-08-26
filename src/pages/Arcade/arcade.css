@@ -29,18 +29,40 @@
   transform: translateY(1px);
 }
 
+/* ---------- 놀이 선택 탭 ---------- */
+
+.arTabs {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+/* .tab은 button 기준이라 링크로 쓸 때 필요한 것만 덧댄다. */
+.arTabs .tab {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.arTabs .tab--on {
+  background: var(--ink);
+  color: var(--white);
+  border-color: var(--ink);
+}
+
 /* ---------- 섹션 공통 (홈보다 한 톤 낮은 밀도) ---------- */
 
 .arSection {
-  margin-top: 28px;
+  margin-top: 16px;
   border-radius: var(--r-18);
   border: 1px solid var(--border-soft);
   padding: 28px 30px;
   background: var(--surface-2);
-}
-
-.arSection--balance {
-  margin-top: 16px;
+  /* 한 번에 한 놀이만 보여주므로, 섹션이 "무대" 높이를 갖도록 바닥을 깔아준다.
+     이게 없으면 진입 화면이 짧은 띠처럼 떠 있고 아래가 텅 빈다. */
+  min-height: min(520px, calc(100dvh - 230px));
+  display: flex;
+  flex-direction: column;
 }
 
 .arSection__head {
@@ -49,6 +71,7 @@
   gap: 10px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+  flex: none;
 }
 
 .arSection__name {
@@ -67,6 +90,11 @@
 }
 
 /* ---------- 01 유형검사 ---------- */
+
+/* 진입 문구는 무대 한가운데. 진행/결과는 위에서부터 쌓인다. */
+.arQuiz__intro {
+  margin-block: auto;
+}
 
 .arQuiz__hook {
   margin: 0;
@@ -619,13 +647,14 @@
 /* ---------- 반응형 ---------- */
 
 @media (max-width: 700px) {
+  .arTabs {
+    margin-top: 2px;
+  }
   .arSection {
-    margin-top: 20px;
+    margin-top: 12px;
     padding: 22px 20px;
     border-radius: var(--r-16);
-  }
-  .arSection--balance {
-    margin-top: 12px;
+    min-height: min(420px, calc(100dvh - 250px));
   }
   .arQuiz__hook {
     font-size: 22px;
