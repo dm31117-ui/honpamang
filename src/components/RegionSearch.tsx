@@ -16,7 +16,7 @@ interface RegionSearchProps {
 
 /**
  * GeoJSON 229개 시·군·구 부분일치 검색.
- * 메인 상황작성 모달과 박물관 등록 모달이 공유한다.
+ * 메인 상황작성 모달과 전당 등록 모달이 공유한다.
  */
 export function RegionSearch({
   query,

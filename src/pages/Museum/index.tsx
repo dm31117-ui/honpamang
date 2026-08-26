@@ -99,7 +99,7 @@ export function Museum() {
     <div className="page">
       <div className="container">
         <PageHeader
-          title="대참사 박물관"
+          title="대참사 전당"
           action={
             <button type="button" className="btn btn--hard" onClick={() => setSubmitOpen(true)}>
               <PlusIcon />

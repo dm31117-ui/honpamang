@@ -72,7 +72,7 @@ a {
   padding-bottom: 40px;
   position: relative;
   /* SOS 펄스 링·사이렌 글로우 같은 장식이 좁은 화면에서 문서를 옆으로 밀지 않게.
-     `clip`은 `hidden`과 달리 스크롤 컨테이너를 만들지 않아 박물관 상세의
+     `clip`은 `hidden`과 달리 스크롤 컨테이너를 만들지 않아 전당 상세의
      position:sticky가 그대로 동작한다. */
   overflow-x: clip;
 }
