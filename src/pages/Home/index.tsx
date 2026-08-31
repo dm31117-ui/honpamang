@@ -69,6 +69,7 @@ export function Home() {
   );
 
   // 남들의 비명 — 900~3500ms 랜덤 간격. 내 비명보다 작고 흐리다.
+  // 연출일 뿐이라 TODAY 카운트는 건드리지 않는다. 카운트는 실제로 SOS를 누른 것만 센다.
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
@@ -86,7 +87,6 @@ export function Home() {
         op: 0.75,
       };
       addShout(shout);
-      setSosCount((c) => c + 1);
       timer = setTimeout(loop, rand(900, 3500));
     };
 
