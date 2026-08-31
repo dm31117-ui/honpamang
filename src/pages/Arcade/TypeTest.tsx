@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { AXIS_COLOR, QUESTIONS, RESULTS, type Axis } from '../../data/arcade';
+import { SITE_DOMAIN } from '../../lib/site';
 import { QUIZ_INITIAL, useArcade } from './context';
 
 const AXES: Axis[] = ['혼돈', '파괴', '절망'];
@@ -34,7 +35,7 @@ export function TypeTest() {
     });
 
   const share = (kind: 'insta' | 'x') => {
-    const text = `내 혼파망 유형: ${result.name} — honpamang.kr`;
+    const text = `내 혼파망 유형: ${result.name} — ${SITE_DOMAIN}`;
     try {
       void navigator.clipboard?.writeText(text);
     } catch {
@@ -117,7 +118,7 @@ export function TypeTest() {
                   </span>
                 </div>
               ))}
-              <p className="arCard__brand">HONPAMANG.KR</p>
+              <p className="arCard__brand">{SITE_DOMAIN.toUpperCase()}</p>
             </div>
           </div>
 

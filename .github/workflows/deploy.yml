@@ -9,7 +9,7 @@ env:
   # 커스텀 도메인을 붙였다면 여기에 적는다 (예: app.honpamang.kr).
   # 비워두면 https://<user>.github.io/<repo>/ 로 배포된다.
   # 이 값을 채우기 전에 DNS와 Settings → Pages → Custom domain을 먼저 맞춰야 한다.
-  CUSTOM_DOMAIN: ''
+  CUSTOM_DOMAIN: 'honpamang.mbers.kr'
 
 # Pages 배포에 필요한 최소 권한
 permissions:

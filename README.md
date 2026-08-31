@@ -146,10 +146,11 @@ DNS 확인이 끝나면 **Enforce HTTPS**를 켭니다 (인증서 발급에 몇 
 저장소당 커스텀 도메인은 하나입니다.
 
 **3. 저장소 설정** — `.github/workflows/deploy.yml` 맨 위 `CUSTOM_DOMAIN`에 같은 도메인을 적습니다.
+공유 문구·결과 카드에 노출되는 도메인은 `src/lib/site.ts`의 `SITE_DOMAIN`에서 따로 관리합니다.
 
 ```yaml
 env:
-  CUSTOM_DOMAIN: 'app.honpamang.kr'
+  CUSTOM_DOMAIN: 'honpamang.mbers.kr'
 ```
 
 이 값이 채워지면 빌드 base가 `/<repo>/`에서 `/`로 바뀌고, 배포 아티팩트에 `CNAME` 파일이
