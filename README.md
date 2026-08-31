@@ -100,8 +100,10 @@ src/
 ## 배포
 
 `main`에 푸시하면 `.github/workflows/deploy.yml`이 GitHub Pages로 배포합니다.
-워크플로의 `configure-pages` 단계가 `enablement: true`라 Pages가 꺼져 있으면 첫 실행에서
-자동으로 켭니다. 안 켜지면 **Settings → Pages → Source**를 **GitHub Actions**로 직접 지정하세요.
+
+**최초 1회만 수동 설정이 필요합니다** — **Settings → Pages → Source**를 **GitHub Actions**로
+지정하세요. 이걸 건너뛰면 `configure-pages` 단계가 실패합니다. 워크플로에서 자동으로 켜는
+`enablement: true`는 `GITHUB_TOKEN`에 Pages 사이트 생성 권한이 없어 동작하지 않습니다.
 
 **전제: 저장소가 공개이거나 GitHub Pro 이상이어야 합니다.** 무료 플랜 + 비공개 저장소에서는
 Pages 배포 자체가 막혀 있어 `configure-pages` 단계에서 실패합니다. Pro로 비공개 저장소를
