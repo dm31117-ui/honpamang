@@ -56,7 +56,8 @@
     0 0 60px rgba(229, 72, 77, 0.45);
   transition:
     transform 0.16s ease,
-    box-shadow 0.16s ease;
+    box-shadow 0.16s ease,
+    filter 0.2s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -66,17 +67,22 @@
 }
 
 @media (hover: hover) {
+  /* hover에서는 자리를 지킨 채 빛만 강해진다 — 눌린 것처럼 보이지 않게. */
   .hero__sos:hover {
-    transform: translateY(3px);
-    box-shadow:
-      0 7px 0 var(--ink-border),
-      0 0 60px rgba(229, 72, 77, 0.55);
+    filter: brightness(1.06) saturate(1.05);
+    animation: sosGlow 1.6s ease-in-out infinite;
+  }
+
+  /* 누르는 순간에는 발광을 멈추고 눌린 그림자에 자리를 넘긴다. */
+  .hero__sos:hover:active {
+    animation: none;
   }
 }
 
 .hero__sos:active {
   transform: translateY(9px);
   box-shadow: 0 1px 0 var(--ink-border);
+  filter: none;
 }
 
 .hero__ring {

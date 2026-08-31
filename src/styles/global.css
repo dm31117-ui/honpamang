@@ -201,6 +201,23 @@ a {
   }
 }
 
+/* SOS 버튼 hover — 움직이지 않고 숨쉬듯 빛난다. 내려앉는 건 실제 클릭에서만. */
+@keyframes sosGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 10px 0 var(--ink-border),
+      0 0 60px rgba(229, 72, 77, 0.55),
+      0 0 24px rgba(255, 138, 122, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 10px 0 var(--ink-border),
+      0 0 96px rgba(229, 72, 77, 0.8),
+      0 0 40px rgba(255, 138, 122, 0.55);
+  }
+}
+
 @keyframes shoutFly {
   0% {
     opacity: 0;
