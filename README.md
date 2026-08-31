@@ -2,6 +2,8 @@
 
 > 혼돈 · 파괴 · 망함 — 지금 터진 멘탈을 익명 한 줄로 전국 지도에 올리고, 서로 위로를 보내는 웹 서비스.
 
+**https://honpamang.mbers.kr**
+
 디자인 핸드오프(`design_handoff_honpamang`)를 React로 구현한 프론트엔드입니다. 백엔드 없이
 컴포넌트 로컬 상태 + `localStorage`로 동작하며, 데스크톱과 모바일 양쪽에 대응합니다.
 
