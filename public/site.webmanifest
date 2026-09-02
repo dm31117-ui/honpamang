@@ -1,0 +1,16 @@
+{
+  "name": "혼파망 — 오늘 망한 사람 모여라",
+  "short_name": "혼파망",
+  "description": "지금 터진 멘탈을 익명 한 줄로 전국 지도에 올리고, 서로 위로를 보내는 혼돈·파괴·망함의 공유 서비스.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FAFAF8",
+  "theme_color": "#FF4E2B",
+  "icons": [
+    { "src": "favicon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "favicon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

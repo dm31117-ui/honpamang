@@ -49,6 +49,14 @@ export function ChevronLeftIcon({ size = 14, strokeWidth = 2.2 }: IconProps) {
   );
 }
 
+export function ChevronRightIcon({ size = 14, strokeWidth = 2.2 }: IconProps) {
+  return (
+    <svg {...base(size, strokeWidth)} strokeLinejoin="round">
+      <path d="M9 5l7 7-7 7" />
+    </svg>
+  );
+}
+
 export function ArrowUpRightIcon({ size = 15, strokeWidth = 2.2 }: IconProps) {
   return (
     <svg {...base(size, strokeWidth)}>

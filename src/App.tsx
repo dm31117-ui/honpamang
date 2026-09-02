@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { Home } from './pages/Home';
 import { Museum } from './pages/Museum';
 import { Arcade } from './pages/Arcade';
+import { TestPicker } from './pages/Arcade/TestPicker';
 import { TypeTest } from './pages/Arcade/TypeTest';
 import { BalanceGame } from './pages/Arcade/BalanceGame';
 
@@ -24,7 +25,8 @@ export function App() {
         <Route path="/museum" element={<Museum />} />
         <Route path="/playground" element={<Arcade />}>
           <Route index element={<Navigate to="test" replace />} />
-          <Route path="test" element={<TypeTest />} />
+          <Route path="test" element={<TestPicker />} />
+          <Route path="test/:testId" element={<TypeTest />} />
           <Route path="balance" element={<BalanceGame />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
