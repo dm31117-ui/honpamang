@@ -61,13 +61,25 @@
   font-weight: 700;
 }
 
+.muCount {
+  margin: 14px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.muCount strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
 /* ---------- 목록 + 상세 ---------- */
 
 .muBoard {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
   gap: 32px;
-  margin-top: 32px;
+  margin-top: 16px;
   align-items: start;
 }
 
@@ -153,6 +165,11 @@
   margin: 24px 4px;
   font-size: 14px;
   color: var(--muted);
+}
+
+/* 목록 flex gap 위에 한 칸 더 띄워 카드 더미와 분리한다. */
+.muList .pagination {
+  margin-top: 12px;
 }
 
 /* ---------- 상세 패널 ---------- */
@@ -315,7 +332,7 @@
 
 @media (max-width: 900px) {
   .muBoard {
-    margin-top: 24px;
+    margin-top: 12px;
   }
   /* 상세는 바텀시트(Modal)로 뜨므로 sticky 여백을 지운다. */
   .muDetail {
