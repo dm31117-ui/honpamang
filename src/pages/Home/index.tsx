@@ -2,9 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from '../../components/Logo';
 import { ArrowUpRightIcon } from '../../components/Icons';
-import { loadGeo, regionsOf, type Region } from '../../lib/geo';
-import { loadSosToday, saveSosToday } from '../../lib/storage';
 import { useTimers } from '../../lib/hooks';
+import { relativeTime } from '../../lib/time';
+import { loadProfile } from '../../lib/storage';
+import { useLiveBoard, type PressEvent } from '../../lib/useLiveBoard';
+import type { LivePost, ReactionKind } from '../../lib/live';
 import { INFLOW_POOL, SEED_CARDS, SEED_PINS, SHOUT_WORDS, type FeedCard } from '../../data/home';
 import { Ticker } from './Ticker';
 import { SosHero, type Shout } from './SosHero';
@@ -19,46 +21,34 @@ const CHAOS_INDEX = 98.4;
 const HIGHLIGHT_NEWEST = true;
 const SHOUT_LIFETIME = 3300;
 const INFLOW_INTERVAL = 7000;
-
-interface UserPin {
-  count: number;
-  stories: string[];
-  label: string;
-}
+/** 상대 시각("7분 전") 갱신 주기. */
+const CLOCK_INTERVAL = 30_000;
+/** 프레스가 지나간 지역 핀이 번쩍이는 시간. */
+const PULSE_LIFETIME = 1400;
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 const pickWord = () => SHOUT_WORDS[Math.floor(Math.random() * SHOUT_WORDS.length)];
+const isSeed = (id: string) => id.startsWith('seed-');
+
+/** 비상벨 수 → 핀 지름(px). 상위 지역만 거대해지지 않게 제곱근으로 누른다. */
+const pinSize = (count: number) => Math.min(30, Math.round(10 + Math.sqrt(count) * 1.6));
 
 export function Home() {
   const navigate = useNavigate();
   const { after } = useTimers();
 
-  const [sosCount, setSosCount] = useState(0);
   const [shouts, setShouts] = useState<Shout[]>([]);
-  const [extra, setExtra] = useState<FeedCard[]>([]);
-  const [userPins, setUserPins] = useState<Record<string, UserPin>>({});
-  const [regionName, setRegionName] = useState('');
-  const [pinId, setPinId] = useState<string | null>(null);
-  const [cardId, setCardId] = useState<number | null>(null);
+  const [selected, setSelected] = useState('');
+  const [cardId, setCardId] = useState<string | null>(null);
   const [writeOpen, setWriteOpen] = useState(false);
-  const [presetRegion, setPresetRegion] = useState<Region | null>(null);
-  const [regions, setRegions] = useState<Region[]>([]);
+  const [presetRegion, setPresetRegion] = useState<string>('');
+  const [now, setNow] = useState(() => Date.now());
+  /** 방금 누군가 SOS를 누른 지역들 — 해당 핀이 잠깐 번쩍인다. */
+  const [pulsed, setPulsed] = useState<string[]>([]);
+  /** 백엔드가 없을 때만 쓰는 로컬 피드 (시드 유입 시뮬레이션 + 내가 쓴 글). */
+  const [localPosts, setLocalPosts] = useState<LivePost[]>([]);
 
-  const nextId = useRef(900);
-
-  // 오늘 SOS 카운트 복원 (날짜가 바뀌었으면 0)
-  useEffect(() => setSosCount(loadSosToday()), []);
-
-  // 지역 라벨 조회용 목록 (지도 팝업 · 모달 프리필)
-  useEffect(() => {
-    let alive = true;
-    loadGeo().then((geo) => {
-      if (alive && geo) setRegions(regionsOf(geo));
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const nextLocalId = useRef(0);
 
   const addShout = useCallback(
     (shout: Shout) => {
@@ -68,16 +58,53 @@ export function Home() {
     [after],
   );
 
-  // 남들의 비명 — 900~3500ms 랜덤 간격. 내 비명보다 작고 흐리다.
-  // 연출일 뿐이라 TODAY 카운트는 건드리지 않는다. 카운트는 실제로 SOS를 누른 것만 센다.
+  /** 누군가 SOS를 눌렀다. 내 비명은 크고 진하게, 남의 비명은 작고 흐리게. */
+  const onPress = useCallback(
+    ({ mine, region }: PressEvent) => {
+      if (region) {
+        setPulsed((prev) => [...prev, region]);
+        after(PULSE_LIFETIME, () =>
+          setPulsed((prev) => {
+            const i = prev.indexOf(region);
+            return i < 0 ? prev : [...prev.slice(0, i), ...prev.slice(i + 1)];
+          }),
+        );
+      }
+      const left = Math.random() < 0.5;
+      addShout({
+        id: Math.random().toString(36).slice(2),
+        text: pickWord(),
+        x: `${(left ? rand(mine ? 10 : 4, mine ? 34 : 34) : rand(mine ? 66 : 64, mine ? 90 : 94)).toFixed(1)}%`,
+        y: `${rand(mine ? 20 : 10, mine ? 74 : 86).toFixed(1)}%`,
+        size: `${rand(mine ? 12 : 10, mine ? 17 : 13).toFixed(0)}px`,
+        color: mine ? 'var(--muted-3)' : 'var(--shout-ambient)',
+        op: mine ? 1 : 0.75,
+      });
+    },
+    [addShout, after],
+  );
+
+  const live = useLiveBoard({ onPress });
+  const posts = live.enabled ? live.posts : localPosts;
+
+  // 상대 시각은 흐르는 값이라 주기적으로 다시 계산한다.
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), CLOCK_INTERVAL);
+    return () => clearInterval(id);
+  }, []);
+
+  // 배경 비명 — 900~3500ms 랜덤 간격의 연출. 실시간이 붙어 있으면 진짜 비명이
+  // 올라오므로 간격을 늘려 실제 프레스가 묻히지 않게 한다.
+  // 어느 쪽이든 TODAY 카운트는 건드리지 않는다.
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
+    const [lo, hi] = live.enabled ? [2600, 7000] : [900, 3500];
 
     const loop = () => {
       if (cancelled) return;
       const left = Math.random() < 0.5;
-      const shout: Shout = {
+      addShout({
         id: 'a' + Math.random().toString(36).slice(2),
         text: pickWord(),
         x: `${(left ? rand(4, 34) : rand(64, 94)).toFixed(1)}%`,
@@ -85,9 +112,8 @@ export function Home() {
         size: `${rand(10, 13).toFixed(0)}px`,
         color: 'var(--shout-ambient)',
         op: 0.75,
-      };
-      addShout(shout);
-      timer = setTimeout(loop, rand(900, 3500));
+      });
+      timer = setTimeout(loop, rand(lo, hi));
     };
 
     timer = setTimeout(loop, 1200);
@@ -95,156 +121,172 @@ export function Home() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [addShout]);
+  }, [addShout, live.enabled]);
 
-  // 실시간 유입 시뮬레이션. 프로덕션에서는 소켓/폴링으로 대체한다.
+  // 백엔드가 없을 때만 도는 유입 시뮬레이션. 붙어 있으면 진짜 글이 들어온다.
   useEffect(() => {
+    if (live.enabled) return;
     let i = 0;
     const id = setInterval(() => {
       const p = INFLOW_POOL[i % INFLOW_POOL.length];
       i += 1;
-      setExtra((prev) => [{ ...p, id: 100 + i, time: '방금' }, ...prev].slice(0, 8));
+      setLocalPosts((prev) =>
+        [
+          {
+            id: `sim-${i}`,
+            nick: p.nick,
+            region: p.gu,
+            story: p.story,
+            cheers: p.cheers,
+            forgets: p.forgets,
+            createdAt: new Date().toISOString(),
+          },
+          ...prev,
+        ].slice(0, 12),
+      );
     }, INFLOW_INTERVAL);
     return () => clearInterval(id);
-  }, []);
+  }, [live.enabled]);
 
-  const pressSos = useCallback(() => {
-    setSosCount((c) => {
-      const next = c + 1;
-      saveSosToday(next);
-      return next;
-    });
-    const left = Math.random() < 0.5;
-    addShout({
-      id: Math.random().toString(36).slice(2),
-      text: pickWord(),
-      x: `${(left ? rand(10, 34) : rand(66, 90)).toFixed(1)}%`,
-      y: `${rand(20, 74).toFixed(1)}%`,
-      size: `${rand(12, 17).toFixed(0)}px`,
-      color: 'var(--muted-3)',
-      op: 1,
-    });
-  }, [addShout]);
-
-  // 시드 핀 + 사용자가 등록한 핀 병합
+  // 시드 핀 + 모두가 올린 글을 지역 라벨로 합친다.
   const pins = useMemo<(MapPin & { stories: string[] })[]>(() => {
-    const merged = SEED_PINS.map((p) => {
-      const u = userPins[p.geoName];
-      return u
-        ? { ...p, count: p.count + u.count, stories: [...u.stories, ...p.stories] }
-        : { ...p };
-    });
-    for (const [geoName, u] of Object.entries(userPins)) {
-      if (merged.some((p) => p.geoName === geoName)) continue;
-      merged.push({
-        id: 'u-' + geoName,
-        name: u.label || geoName,
-        geoName,
-        count: u.count,
-        size: Math.min(28, 13 + u.count * 3),
-        stories: u.stories,
+    const merged = new Map<string, { count: number; stories: string[] }>();
+    for (const p of SEED_PINS) merged.set(p.region, { count: p.count, stories: [...p.stories] });
+    for (const post of posts) {
+      const before = merged.get(post.region) ?? { count: 0, stories: [] };
+      merged.set(post.region, {
+        count: before.count + 1,
+        stories: [post.story, ...before.stories],
       });
     }
-    return merged;
-  }, [userPins]);
+    return [...merged].map(([region, v]) => ({
+      id: `r-${region}`,
+      region,
+      count: v.count,
+      size: pinSize(v.count),
+      stories: v.stories.slice(0, 8),
+    }));
+  }, [posts]);
 
-  const activePin = pins.find((p) => p.id === pinId) ?? null;
-  const pinAtRegion = pins.find((p) => p.geoName === regionName) ?? null;
-  const zoomName = activePin ? activePin.geoName : regionName;
-  const regionLabel = regions.find((r) => r.name === regionName)?.label ?? regionName;
-  /** 사연이 없는 구를 눌렀을 때만 "첫 번째로 울려보세요" 팝업 */
-  const emptyRegionOpen = Boolean(regionName) && !activePin && !pinAtRegion;
+  const cards = useMemo<FeedCard[]>(
+    () => [
+      ...posts.map((p) => ({
+        id: p.id,
+        nick: p.nick,
+        gu: p.region,
+        time: relativeTime(p.createdAt, now),
+        story: p.story,
+        cheers: p.cheers,
+        forgets: p.forgets,
+        createdAt: p.createdAt,
+      })),
+      ...SEED_CARDS,
+    ],
+    [posts, now],
+  );
 
-  const cards = useMemo(() => [...extra, ...SEED_CARDS], [extra]);
+  const activePin = pins.find((p) => p.region === selected) ?? null;
   const activeCard = cards.find((c) => c.id === cardId) ?? null;
+  /** 사연이 없는 구를 눌렀을 때만 "첫 번째로 울려보세요" 팝업 */
+  const emptyRegionOpen = Boolean(selected) && !activePin;
 
-  const resetMap = useCallback(() => {
-    setPinId(null);
-    setRegionName('');
-  }, []);
+  /** 캡션은 실제로 가장 시끄러운 두 지역을 따라간다. */
+  const hotspots = useMemo(
+    () =>
+      [...pins]
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 2)
+        .map((p) => p.region),
+    [pins],
+  );
+
+  const resetMap = useCallback(() => setSelected(''), []);
 
   const openWriteHere = () => {
-    setPresetRegion(regions.find((r) => r.name === regionName) ?? null);
+    setPresetRegion(selected);
     setWriteOpen(true);
   };
 
   const openWrite = () => {
-    setPresetRegion(null);
+    setPresetRegion('');
     setWriteOpen(true);
   };
 
-  const handleSubmit = (v: WriteSubmission) => {
-    nextId.current += 1;
-    setExtra((prev) =>
+  const handleSubmit = async (v: WriteSubmission) => {
+    setWriteOpen(false);
+    const region = v.gu || '전국';
+    if (live.enabled) {
+      await live.publish({ nick: v.nick, region, story: v.text });
+      return;
+    }
+    nextLocalId.current += 1;
+    setLocalPosts((prev) =>
       [
         {
-          id: nextId.current,
+          id: `local-${nextLocalId.current}`,
           nick: v.nick,
-          gu: v.gu,
-          time: '방금',
+          region,
           story: v.text,
           cheers: 0,
           forgets: 0,
+          createdAt: new Date().toISOString(),
         },
         ...prev,
-      ].slice(0, 9),
+      ].slice(0, 12),
     );
+  };
 
-    if (v.geoName) {
-      setUserPins((prev) => {
-        const before = prev[v.geoName!] ?? { count: 0, stories: [], label: v.gu };
-        return {
-          ...prev,
-          [v.geoName!]: {
-            count: before.count + 1,
-            stories: [v.text, ...before.stories].slice(0, 6),
-            label: v.gu,
-          },
-        };
-      });
-    }
-    setWriteOpen(false);
+  const handleReact = (kind: ReactionKind) => {
+    if (activeCard && !isSeed(activeCard.id)) live.react(activeCard.id, kind);
   };
 
   return (
     <div className="page">
-      <Ticker />
+      {/* 실시간 수치는 실제로 연결됐을 때만 — 끊긴 채 "0건 가동 중"을 흘리지 않는다. */}
+      <Ticker
+        lead={
+          live.connected ? `전국 비상벨 ${live.sosToday.toLocaleString()}건 가동 중!` : undefined
+        }
+      />
       <div className="siren" aria-hidden="true" />
 
       <div className="container">
         <header className="homeHeader">
           <div className="homeHeader__brand">
             <Logo height={30} />
-            <span className="livePill">
+            <span className="livePill" data-off={live.enabled && !live.connected}>
               <span className="dot" />
               LIVE
+              {live.online > 1 && <b className="livePill__count">{live.online}명 접속</b>}
             </span>
           </div>
         </header>
 
-        <SosHero todayCount={sosCount} shouts={shouts} onPress={pressSos} />
+        <SosHero
+          todayCount={live.sosToday}
+          shouts={shouts}
+          onPress={() => live.press(loadProfile()?.gu ?? null)}
+          global={live.enabled}
+        />
 
         <section className="board">
           <div className="board__map">
             <KoreaMap
               pins={pins}
               chaosIndex={CHAOS_INDEX}
-              zoomName={zoomName}
-              onPickRegion={(name) => {
-                setRegionName(name);
-                setPinId(null);
-              }}
+              selected={selected}
+              pulsed={pulsed}
+              onPickRegion={setSelected}
               onPickPin={(id) => {
                 const pin = pins.find((p) => p.id === id);
-                setPinId(id);
-                setRegionName(pin ? pin.geoName : '');
+                setSelected(pin ? pin.region : '');
               }}
               onReset={resetMap}
             >
               {activePin && (
                 <div className="mapPopup">
                   <div className="mapPopup__head">
-                    <span className="mapPopup__title">{activePin.name} 실시간 비상벨</span>
+                    <span className="mapPopup__title">{activePin.region} 실시간 비상벨</span>
                     <button
                       type="button"
                       className="mapPopup__close"
@@ -261,13 +303,16 @@ export function Home() {
                       </div>
                     ))}
                   </div>
+                  <button type="button" className="mapPopup__cta" onClick={openWriteHere}>
+                    여기 상황 쓰기
+                  </button>
                 </div>
               )}
 
               {emptyRegionOpen && (
                 <div className="mapPopup">
                   <div className="mapPopup__head">
-                    <span className="mapPopup__title">{regionLabel}</span>
+                    <span className="mapPopup__title">{selected}</span>
                     <button
                       type="button"
                       className="mapPopup__close"
@@ -287,7 +332,9 @@ export function Home() {
               )}
             </KoreaMap>
             <p className="board__caption">
-              오후 2시, 사무실 과부하로 강남·여의도 멘탈 파괴자 급증 중
+              {hotspots.length === 2
+                ? `지금 ${hotspots[0]}·${hotspots[1]} 비상벨이 가장 시끄럽습니다`
+                : '전국 비상벨을 수신하는 중입니다'}
             </p>
           </div>
 
@@ -334,7 +381,7 @@ export function Home() {
         </section>
       </div>
 
-      <CardModal card={activeCard} onClose={() => setCardId(null)} />
+      <CardModal card={activeCard} onClose={() => setCardId(null)} onReact={handleReact} />
       <WriteModal
         open={writeOpen}
         onClose={() => setWriteOpen(false)}

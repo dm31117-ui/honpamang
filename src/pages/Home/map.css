@@ -56,10 +56,50 @@
 
 /* ---------- 지도 본체 ---------- */
 
+/* 확대·이동이 일어나는 창. 확대 중일 때만 드래그를 잡아채 페이지 스크롤을 살린다. */
+.map__viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.map__viewport[data-zoomed='true'] {
+  cursor: grab;
+  touch-action: none;
+}
+.map__viewport[data-zoomed='true']:active {
+  cursor: grabbing;
+}
+
 .map__stage {
   position: absolute;
   inset: 0;
-  transition: transform 0.55s var(--ease-out-expo);
+  transform-origin: 0 0;
+  transition: transform 0.5s var(--ease-out-expo);
+}
+/* 끄는 동안에는 손가락을 그대로 따라와야 한다. */
+.map__stage[data-dragging='true'] {
+  transition: none;
+}
+
+/* 커서를 올린 구의 이름 — 229개 중 어디를 누르는지 알 수 있어야 한다. */
+.map__tip {
+  position: absolute;
+  z-index: 5;
+  transform: translate(12px, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.map__tip b {
+  color: var(--accent);
 }
 
 .map__svg {
@@ -70,6 +110,12 @@
 
 .map__path {
   cursor: pointer;
+  transition: fill 0.2s ease;
+}
+@media (hover: hover) {
+  .map__path:hover {
+    fill: rgba(255, 78, 43, 0.34);
+  }
 }
 
 /* ---------- 핀 ---------- */
@@ -90,6 +136,37 @@
   .mapPin:hover {
     transform: translate(-50%, -50%) scale(calc(var(--pin-scale, 1) * 1.08));
     z-index: 2;
+  }
+}
+
+.mapPin[data-bare='true'] {
+  opacity: 0.85;
+}
+
+/* 누군가 그 지역에서 SOS를 누른 순간 — 핀이 한 번 크게 번진다. */
+.mapPin[data-pulse='true'] .mapPin__dot::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: var(--r-pill);
+  border: 2px solid var(--accent);
+  animation: pinBurst 1.4s var(--ease-out-expo);
+}
+
+@keyframes pinBurst {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapPin[data-pulse='true'] .mapPin__dot::after {
+    animation: none;
   }
 }
 
@@ -139,17 +216,117 @@
 
 /* ---------- 오버레이 HUD ---------- */
 
-.map__scan {
+.map__hud {
   position: absolute;
-  top: 20px;
-  left: 24px;
+  top: 14px;
+  left: 14px;
+  z-index: 6;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+}
+
+.map__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.02em;
   font-size: 12px;
   font-weight: 600;
+  color: var(--ink);
+  transition: var(--t-paint);
+}
+@media (hover: hover) {
+  .map__chip:hover {
+    border-color: var(--ink);
+  }
+}
+
+.map__chip--quiet {
+  border-color: transparent;
+  background: transparent;
   color: var(--muted);
-  pointer-events: none;
+  cursor: default;
+  padding-left: 8px;
+}
+
+.map__chip--icon {
+  padding: 8px 10px;
+  color: var(--muted);
+}
+
+.map__find {
+  position: relative;
+}
+
+.map__findBox {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 216px;
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-14);
+  box-shadow: var(--sh-popup);
+  padding: 8px;
+  animation: riseIn 0.2s var(--ease-out-expo);
+}
+
+.map__findInput {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 7px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  background: var(--white);
+}
+.map__findInput:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.map__findList {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+  max-height: 168px;
+  overflow-y: auto;
+}
+
+.map__findItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 10px;
+  border: none;
+  background: none;
+  border-radius: var(--r-10, 10px);
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: -0.02em;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+}
+.map__findItem span {
+  color: var(--accent);
+  font-weight: 700;
+}
+@media (hover: hover) {
+  .map__findItem:hover {
+    background: var(--surface);
+  }
 }
 
 .map__index {
@@ -187,30 +364,62 @@
   font-weight: 700;
 }
 
-.map__reset {
+/* 확대·축소 버튼 — 휠이 없는 기기에서도 지도를 파고들 수 있어야 한다. */
+.map__zoom {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  right: 14px;
+  bottom: 14px;
   z-index: 6;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
   border-radius: var(--r-pill);
+  overflow: hidden;
   border: 1px solid var(--border);
   background: var(--white);
-  cursor: pointer;
-  font-family: inherit;
-  letter-spacing: -0.02em;
-  font-size: 12px;
-  font-weight: 600;
+}
+
+.map__zoom button {
+  width: 34px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
   color: var(--ink);
-  transition: var(--t-paint);
+  cursor: pointer;
+}
+.map__zoom button + button {
+  border-top: 1px solid var(--border-soft);
+}
+.map__zoom button:disabled {
+  color: var(--border);
+  cursor: default;
 }
 @media (hover: hover) {
-  .map__reset:hover {
-    border-color: var(--ink);
+  .map__zoom button:not(:disabled):hover {
+    background: var(--surface);
   }
+}
+
+.map__legend {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.map__legendBar {
+  width: 62px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, rgba(255, 78, 43, 0.07), rgba(255, 78, 43, 0.49));
 }
 
 /* ---------- 하단 팝업 ---------- */
@@ -314,10 +523,20 @@
 }
 
 @media (max-width: 600px) {
-  .map__scan {
-    top: 14px;
-    left: 16px;
+  .map__hud {
+    top: 10px;
+    left: 10px;
     font-size: 11px;
+  }
+  .map__chip {
+    padding: 7px 12px;
+    font-size: 11px;
+  }
+  .map__findBox {
+    width: 180px;
+  }
+  .map__legend {
+    display: none;
   }
   .map__index {
     top: 10px;
@@ -334,12 +553,6 @@
   .map__indexTag {
     font-size: 10px;
     padding: 2px 7px;
-  }
-  .map__reset {
-    top: 10px;
-    left: 10px;
-    padding: 7px 12px;
-    font-size: 11px;
   }
   .mapPin__label {
     font-size: 10px;

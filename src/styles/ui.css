@@ -131,6 +131,27 @@
   color: var(--accent);
 }
 
+/* 실시간 채널이 끊긴 동안에는 LIVE를 켜둔 척하지 않는다. */
+.livePill[data-off='true'] {
+  border-color: var(--border);
+  color: var(--muted);
+}
+.livePill[data-off='true'] .dot {
+  background: var(--muted);
+  animation: none;
+}
+
+.livePill__count {
+  padding-left: 6px;
+  margin-left: 2px;
+  border-left: 1px solid var(--accent-line);
+  color: var(--muted-3);
+  font-weight: 600;
+}
+.livePill[data-off='true'] .livePill__count {
+  border-left-color: var(--border);
+}
+
 .dot {
   width: 6px;
   height: 6px;

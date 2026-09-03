@@ -4,8 +4,10 @@
 
 **https://honpamang.mbers.kr**
 
-디자인 핸드오프(`design_handoff_honpamang`)를 React로 구현한 프론트엔드입니다. 백엔드 없이
-컴포넌트 로컬 상태 + `localStorage`로 동작하며, 데스크톱과 모바일 양쪽에 대응합니다.
+디자인 핸드오프(`design_handoff_honpamang`)를 React로 구현한 프론트엔드입니다.
+SOS 버튼과 비상벨 피드는 **접속한 모든 사람이 같은 화면을 봅니다** — TODAY 카운트는 전국 합계이고,
+남이 누른 SOS도 내 화면에 비명과 지도 핀 번쩍임으로 나타납니다. 실시간 백엔드는 Supabase이며
+설정을 비워두면 백엔드 없이 로컬 상태로 떨어집니다 (아래 [실시간 동기화](#실시간-동기화) 참고).
 
 ## 화면
 
@@ -23,7 +25,8 @@
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
+cp .env.example .env.local   # 실시간 동기화를 켤 때만. 비워두면 로컬 모드로 뜬다
+npm run dev                  # http://localhost:5173
 ```
 
 | 스크립트 | 설명 |
@@ -39,6 +42,8 @@ npm run dev      # http://localhost:5173
 
 - **Vite + React 18 + TypeScript** — 백엔드가 없는 순수 클라이언트 앱이라 정적 배포가 가장 단순합니다.
 - **react-router-dom** — 프로토타입의 탭 상태(`home`/`museum`/`arcade`)를 실제 경로로 대체했습니다.
+- **Supabase** — 실시간 동기화(Postgres + Realtime)를 정적 배포 그대로 쓰기 위한 선택입니다.
+  브라우저가 anon 키로 직접 붙고, 방어선은 RLS입니다. 서버를 따로 띄우지 않아 GitHub Pages 배포가 유지됩니다.
 - **순수 CSS + 디자인 토큰** — 색·간격·모션 값은 전부 `src/styles/tokens.css`의 CSS 변수입니다.
   프레임워크를 얹지 않아 핸드오프 값과 1:1로 대조됩니다.
 
@@ -52,15 +57,21 @@ src/
 │   ├── global.css       # 리셋 · 레이아웃 프리미티브 · 공용 keyframes
 │   └── ui.css           # 버튼 · 필 · 폼 · 모달 프리미티브
 ├── lib/
-│   ├── geo.ts           # GeoJSON 로딩(모듈 캐시) + equirectangular 투영 + 지역 검색
-│   ├── storage.ts       # localStorage 래퍼 (프로필 · 오늘 SOS 카운트)
+│   ├── geo.ts           # GeoJSON 로딩(모듈 캐시) + 투영 + 지역 검색 ("{시도} {구·군}" 라벨이 식별자)
+│   ├── supabase.ts      # 실시간 백엔드 클라이언트 (환경변수가 없으면 null)
+│   ├── live.ts          # sos_presses · posts 테이블 접근 + 실시간 구독
+│   ├── useLiveBoard.ts  # 전국 SOS 카운트 · 공유 피드 · 접속자 수 상태
+│   ├── storage.ts       # localStorage 래퍼 (프로필 · 오프라인 SOS 카운트)
+│   ├── time.ts          # "방금 · 7분 전" 표기
 │   └── hooks.ts         # useMediaQuery · useElementSize · useModal · useTimers
 ├── components/          # Modal · RegionSearch · PageHeader · Logo · Icons
 ├── data/                # 시드 데이터 (피드 · 지도 핀 · 전당 · 문항 · 딜레마)
-└── pages/
-    ├── Home/            # Ticker · SosHero · KoreaMap · Feed · CardModal · WriteModal
-    ├── Museum/          # 목록 · 상세 패널 · 등록 모달
-    └── Arcade/          # 레이아웃(탭 + 놀이 상태) · TypeTest · BalanceGame · 망각하기 모달
+├── pages/
+│   ├── Home/            # Ticker · SosHero · KoreaMap · Feed · CardModal · WriteModal
+│   ├── Museum/          # 목록 · 상세 패널 · 등록 모달
+│   └── Arcade/          # 레이아웃(탭 + 놀이 상태) · TypeTest · BalanceGame · 망각하기 모달
+└── ../supabase/
+    └── schema.sql       # 실시간 동기화 테이블 · RLS · RPC (대시보드에 한 번 실행)
 ```
 
 ## 반응형
@@ -69,7 +80,7 @@ src/
 다시 잡았습니다.
 
 - **지도** — 고정 폭을 없애고 `ResizeObserver`로 컨테이너 크기를 추적해 매번 재투영합니다.
-  핀 크기는 기준 폭(753px) 대비 비율로 줄어들고, 확대(×6.5) 시 `1/6.5` 역보정은 그대로 둡니다.
+  핀 크기는 기준 폭(753px) 대비 비율로 줄어들고, 확대 배율만큼 역보정해 화면상 크기를 유지합니다.
 - **1024px 이하** — 지도 + 피드가 1열로 내려가고, 피드는 내부 스크롤(522px 고정)을 버리고
   페이지 스크롤을 따릅니다.
 - **900px 이하** — 전당 상세가 sticky 사이드 패널에서 바텀시트 모달로 바뀝니다.
@@ -82,22 +93,60 @@ src/
   `hidden`이 아닌 `clip`이라 전당 상세의 `position: sticky`가 그대로 동작합니다.
 - `prefers-reduced-motion`에서 무한 루프 애니메이션이 멈춥니다.
 
+## 실시간 동기화
+
+`VITE_SUPABASE_URL`과 `VITE_SUPABASE_ANON_KEY`가 모두 있으면 실시간 모드로 뜹니다.
+하나라도 비어 있으면 `LIVE_ENABLED`가 `false`가 되어 예전처럼 로컬 상태 + 유입 시뮬레이션으로
+동작합니다. 두 모드의 화면 구성은 같아서, 백엔드 없이도 개발과 프리뷰가 그대로 됩니다.
+
+| | 실시간 모드 | 로컬 모드 |
+| --- | --- | --- |
+| TODAY 카운트 | 전국 합계 (`전국 TODAY`) | 이 브라우저의 오늘 기록 |
+| 남이 누른 SOS | 비명 + 그 지역 핀 번쩍임 | 배경 연출만 |
+| 비상벨 피드 | 모두가 쓴 글 | 시드 + 7초 유입 시뮬레이션 |
+| 위로 · 절망 수 | 서버 합계 | 화면 안에서만 |
+| 접속자 수 | LIVE 배지에 표기 | 표기 없음 |
+
+### 붙이는 순서
+
+1. [supabase.com](https://supabase.com)에서 프로젝트를 하나 만듭니다 (무료 티어로 충분합니다).
+2. **SQL Editor**에 `supabase/schema.sql`을 통째로 붙여넣고 실행합니다.
+   테이블 2개 · RLS 정책 · RPC 2개 · 실시간 발행 설정이 한 번에 잡힙니다.
+3. **Project Settings → Data API**에서 `Project URL`과 `anon public` 키를 복사합니다.
+4. 로컬은 `.env.local`에, 배포는 저장소 **Settings → Secrets and variables → Actions**의
+   `VITE_SUPABASE_URL` · `VITE_SUPABASE_ANON_KEY`에 넣습니다. 워크플로가 빌드 때 주입합니다.
+
+anon 키는 브라우저 번들에 그대로 실리는 공개 키입니다. 이게 정상이고, 실제 방어선은 RLS입니다.
+`service_role` 키는 어떤 경우에도 넣지 마세요. 익명 서비스라 로그인은 없고, 스팸은 컬럼 길이
+제약 + 반응/카운트를 RPC로만 열어두는 것으로 1차 방어합니다. 더 필요하면 Supabase 쪽
+Rate limit이나 Edge Function을 앞에 두는 게 다음 단계입니다.
+
+### 데이터 모델
+
+- `sos_presses` — SOS를 누를 때마다 한 줄. TODAY 카운트는 오늘(KST) 행 수(`sos_today()` RPC)이고,
+  INSERT 실시간 이벤트가 모든 접속자 화면의 비명·핀 번쩍임을 만듭니다.
+  내가 넣은 행의 id를 기억해 두고 되돌아온 이벤트와 대조해, 내 비명만 크고 진하게 그립니다.
+  카운트는 이벤트에서만 올립니다 — 미리 올리면 이벤트가 돌아올 때 두 번 세어집니다.
+- `posts` — 비상벨 상황. 피드와 지도 핀이 같은 목록을 씁니다. 반응은 `react_post()` RPC로만
+  올라가서 클라이언트가 임의 값을 쓰지 못합니다.
+- 끊겼다 붙는 경우를 대비해 60초마다, 그리고 탭이 다시 보일 때마다 서버 값과 다시 맞춥니다.
+
 ## 데이터
 
 - 지도와 지역 검색은 [southkorea/southkorea-maps](https://github.com/southkorea/southkorea-maps)의
   시·군·구 GeoJSON(229개)을 CDN에서 한 번만 받아 모듈 레벨에서 캐시합니다.
   실패하면 조용히 넘어가고, 지도는 배경 장식만 남습니다.
-- 나머지는 전부 `src/data/`의 시드 + 로컬 상태입니다. 피드는 7초마다 새 카드가 들어오는
-  유입 시뮬레이션이며, 프로덕션에서는 소켓/폴링으로 대체할 자리입니다.
-- `localStorage` 키: `honpamang.profile`(닉네임·지역), `honpamang.sosToday.v2`(오늘 SOS 카운트).
+- **지역 식별자는 `"{시도} {구·군}"` 라벨입니다** (예: `서울 중구`). 구 이름만으로는 중구·서구·
+  북구·강서구처럼 이름이 겹치는 곳이 최대 7군데라, 서울 중구에 올린 글이 울산 중구에 찍혔습니다.
+  시드 데이터·지도 좌표·검색·작성 폼이 전부 이 라벨 하나로 통일돼 있습니다.
+- 시드(`src/data/`)는 지웠을 때 화면이 비지 않게 남겨둔 배경입니다. 실시간 모드에서는
+  서버에서 온 글이 시드 위에 쌓입니다.
+- `localStorage` 키: `honpamang.profile`(닉네임·지역), `honpamang.sosToday.v2`(로컬 모드의 오늘 카운트).
 
-### API로 바꿔야 할 부분
+### 아직 API로 바꿔야 할 부분
 
-1. 비상벨 피드 목록 / 등록 / 반응(위로 · 절망)
-2. 지역별 SOS 카운트 + 사연 목록 (지도 핀)
-3. SOS 프레스 카운트 (TODAY, 남들 비명 실시간 스트림)
-4. 전당 항목 목록 / 등록 / 반응 카운트 — 등급은 서버 합계로 계산
-5. 밸런스게임 투표 집계
+1. 전당 항목 목록 / 등록 / 반응 카운트 — 등급은 서버 합계로 계산
+2. 밸런스게임 투표 집계
 
 ## 배포
 
@@ -188,6 +237,23 @@ DNS 전파 전에 3번만 먼저 적용하면 기존 `github.io/<repo>/` 주소�
 
 - 홈 하단 진입 카드의 `5문항`을 `6문항`으로 고쳤습니다. 핸드오프 자체가 메인(5문항)과
   놀이터(6문항)에서 서로 다르게 적혀 있었는데, 실제 문항은 6개입니다.
+
+## 지도 조작
+
+229개 구·군을 다루는 화면이라 "클릭 한 번에 ×6.5 확대" 하나로는 부족했습니다.
+
+- **확대는 지역 크기에 맞춥니다.** 고정 배율 대신 그 구·군의 경계 상자를 화면에 꽉 차게 담습니다
+  (1~14배). 강남구와 홍천군을 같은 배율로 당기면 한쪽은 안 보이고 한쪽은 화면을 넘칩니다.
+- **끌어서 이동 · 휠 확대 · ±버튼.** 확대 중에만 드래그와 휠을 가로채서, 전국 보기에서는 페이지
+  스크롤이 그대로 살아 있습니다. 4px 넘게 끌면 그 뒤의 클릭은 지역 선택으로 새지 않게 삼킵니다.
+  React는 wheel을 passive로 붙여 `preventDefault`가 먹지 않으므로 네이티브로 직접 겁니다.
+- **밀집도 채색.** 비상벨이 많이 울린 구일수록 진하게 칠합니다(제곱근 스케일). 회색 덩어리였던
+  지도가 "어디가 터졌는지"를 바로 보여줍니다.
+- **커서를 올리면 지역 이름과 건수**가 뜹니다. 229개 중 뭘 누르는지 모르는 상태를 없앱니다.
+- **지역 찾기.** 지도 위 돋보기로 이름을 쳐서 바로 그 구로 날아갑니다. 스크롤과 클릭만으로
+  작은 구를 찾는 것보다 빠르고, 키보드만으로도 도달할 수 있습니다.
+- **라벨 정리.** 전국 보기에서는 상위 8곳만 이름표를 달고 나머지는 점만 찍습니다. 확대하면 전부
+  나옵니다. 빈 바다를 누르면 선택이 풀립니다.
 
 아직 열려 있는 것:
 

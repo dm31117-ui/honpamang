@@ -6,12 +6,14 @@ import './cardModal.css';
 interface CardModalProps {
   card: FeedCard | null;
   onClose: () => void;
+  /** 반응을 서버 합계에 더한다. 시드 카드에는 붙지 않는다. */
+  onReact?: (kind: 'cheer' | 'forget') => void;
 }
 
 type DespairPhase = 'idle' | 'shattering' | 'done';
 
 /** 피드 카드 상세. 반응 4종 + "같이 절망해주기" (shatter → 문구 교체). */
-export function CardModal({ card, onClose }: CardModalProps) {
+export function CardModal({ card, onClose, onReact }: CardModalProps) {
   const [phase, setPhase] = useState<DespairPhase>('idle');
   const [sent, setSent] = useState<Record<string, boolean>>({});
 
@@ -45,6 +47,15 @@ export function CardModal({ card, onClose }: CardModalProps) {
         {story}
       </p>
 
+      <div className="cardModal__stats">
+        <span>
+          위로 <b>{card.cheers}</b>
+        </span>
+        <span>
+          절망 <b>{card.forgets}</b>
+        </span>
+      </div>
+
       <div className="cardModal__reactions">
         {CARD_REACTIONS.map((label) => (
           <button
@@ -52,7 +63,11 @@ export function CardModal({ card, onClose }: CardModalProps) {
             type="button"
             className="cardModal__reaction"
             data-sent={Boolean(sent[label])}
-            onClick={() => setSent((s) => ({ ...s, [label]: true }))}
+            onClick={() => {
+              if (sent[label]) return;
+              setSent((s) => ({ ...s, [label]: true }));
+              onReact?.('cheer');
+            }}
           >
             {label}
           </button>
@@ -63,7 +78,10 @@ export function CardModal({ card, onClose }: CardModalProps) {
         type="button"
         className="btn btn--ink cardModal__despair"
         disabled={phase !== 'idle'}
-        onClick={() => setPhase('shattering')}
+        onClick={() => {
+          setPhase('shattering');
+          onReact?.('forget');
+        }}
       >
         {phase === 'done' ? '절망 완료' : '같이 절망해주기'}
       </button>

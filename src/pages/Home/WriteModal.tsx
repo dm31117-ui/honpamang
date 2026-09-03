@@ -7,10 +7,8 @@ import { loadProfile, saveProfile } from '../../lib/storage';
 
 export interface WriteSubmission {
   nick: string;
-  /** 표기용 지역 라벨 (예: 부산 해운대구) */
+  /** 지역 식별자 겸 표기 라벨 "{시도} {구·군}" — 지도 핀 좌표도 이걸로 찾는다. */
   gu: string;
-  /** GeoJSON 구·군 이름 — 지도 핀 좌표에 쓰인다. 미선택이면 null */
-  geoName: string | null;
   text: string;
 }
 
@@ -18,14 +16,16 @@ interface WriteModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (value: WriteSubmission) => void;
-  /** 지도에서 "여기 상황 쓰기"로 열었을 때 미리 채워지는 지역 */
-  presetRegion?: Region | null;
+  /** 지도에서 "여기 상황 쓰기"로 열었을 때 미리 채워지는 지역 라벨 */
+  presetRegion?: string;
 }
 
 export function WriteModal({ open, onClose, onSubmit, presetRegion }: WriteModalProps) {
   const [nick, setNick] = useState('');
   const [regionQuery, setRegionQuery] = useState('');
   const [region, setRegion] = useState<Region | null>(null);
+  /** 아직 손대지 않은 프리필 값 위에 드롭다운을 띄우지 않는다. */
+  const [dirty, setDirty] = useState(false);
   const [text, setText] = useState('');
 
   // 열릴 때마다 저장된 프로필 + 지도에서 넘어온 지역으로 초기화.
@@ -33,13 +33,9 @@ export function WriteModal({ open, onClose, onSubmit, presetRegion }: WriteModal
     if (!open) return;
     const p = loadProfile();
     setNick(p?.nick ?? '');
-    if (presetRegion) {
-      setRegion(presetRegion);
-      setRegionQuery(presetRegion.label);
-    } else {
-      setRegion(null);
-      setRegionQuery(p?.gu ?? '');
-    }
+    setRegion(null);
+    setDirty(false);
+    setRegionQuery(presetRegion || (p?.gu ?? ''));
   }, [open, presetRegion]);
 
   const submit = () => {
@@ -50,9 +46,9 @@ export function WriteModal({ open, onClose, onSubmit, presetRegion }: WriteModal
       return;
     }
     const finalNick = nick.trim() || '익명의 망붕이';
-    const gu = region?.label ?? regionQuery.trim() ?? '';
-    saveProfile({ nick: finalNick, gu: gu || '전국' });
-    onSubmit({ nick: finalNick, gu: gu || '전국', geoName: region?.name ?? null, text: story });
+    const gu = (region?.label ?? regionQuery.trim()) || '전국';
+    saveProfile({ nick: finalNick, gu });
+    onSubmit({ nick: finalNick, gu, text: story });
     setText('');
   };
 
@@ -86,10 +82,11 @@ export function WriteModal({ open, onClose, onSubmit, presetRegion }: WriteModal
         <RegionSearch
           id="writeRegion"
           query={regionQuery}
-          picked={Boolean(region) && region?.label === regionQuery}
+          picked={!dirty || region?.label === regionQuery}
           onQueryChange={(v) => {
             setRegionQuery(v);
             setRegion(null);
+            setDirty(true);
           }}
           onPick={(r) => {
             setRegion(r);

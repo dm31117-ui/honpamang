@@ -5,7 +5,7 @@ import './feed.css';
 interface FeedProps {
   cards: FeedCard[];
   highlightNewest: boolean;
-  onOpenCard: (id: number) => void;
+  onOpenCard: (id: string) => void;
   onWrite: () => void;
 }
 
